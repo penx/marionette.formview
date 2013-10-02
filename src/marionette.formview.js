@@ -126,6 +126,12 @@
         if (!isValid) fieldErrors.push(errorMessage);
       }
 
+      if (fieldOptions.requiredIfField) {
+        isValid = this.validateRule(val,'requiredIfField', this.inputVal(fieldOptions.requiredIfField.field));
+        var errorMessage = typeof fieldOptions.requiredIfField.errorMessage === 'string' ? fieldOptions.requiredIfField.errorMessage : 'This field is required';
+        if (!isValid) fieldErrors.push(errorMessage);
+      }
+
       // Don't bother with other validations if failed 'required' already
       // Only run validations if the field is required or not blank (i.e. Don't run validations if not required and field is blank)
       if (isValid && validations && (fieldOptions.required || val)) {
@@ -220,20 +226,23 @@
       return val;
     },
 
-    validateRule : function (val,validationRule) {
+    validateRule : function (val,validationRule,options) {
       var options;
 
       // throw an error because it could be tough to troubleshoot if we just return false
       if (!validationRule) throw new Error('Not passed a validation to test');
 
       if (validationRule === 'required') return FormValidator.required(val);
+      if (validationRule === 'requiredIfField') return FormValidator.requiredIfField(val,options);
 
       if (validationRule.indexOf(':') !== -1) {
         options = validationRule.split(":");
         validationRule = options.shift();
       }
 
+
       if (this.rules && this.rules[validationRule]) {
+        //@TODO: allow validation options to be passed to custom rules
         return _(this.rules[validationRule]).bind(this)(val);
       } else {
         return _(FormValidator.validate).bind(this)(validationRule, val, options);
@@ -313,6 +322,17 @@
     required : function(val) {
       if (val === false || _.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
       return true;
+    },
+
+    requiredIfField : function(val,fieldVal) {
+
+      if(!this.required(fieldVal)) {
+        //if the checkbox is not checked, validation is successful
+        return true;
+      } else {
+        //else pass to required
+        return this.required(val);
+      }
     },
 
     boolean : function(val) {

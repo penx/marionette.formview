@@ -327,5 +327,140 @@ describe('Validations',function(){
     });
   });
 
+
+  describe('requiredIfField',function(){
+
+    it('should have the same effect as "required" if checkbox is checked and field is blank',function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template         : "#form-template",
+        fields           : {
+          fnamerequired : {
+            el: ".fnamerequired"
+          },
+          fname : {
+            el         : ".fname",
+            requiredIfField   : {
+              errorMessage: "REQUIRED",
+              field: 'fnamerequired'
+            },
+            validateOn : 'blur',
+            validations : {
+              foo : 'BAR'
+            }
+          }
+        },
+        rules : {
+          foo : function() {
+            return false;
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail     : submitFailSpy,
+        onSubmit         : submitSpy
+      }))();
+
+      form.render();
+
+      //check the checkbox
+      form.$('[data-field="fnamerequired"]').prop('checked', true);
+
+      form.submit();
+
+      expect(submitFailSpy).toHaveBeenCalledWith({
+        fname : {
+          el : ".fname",
+          error : ["REQUIRED"],
+          field : 'fname'
+        }
+      });
+      expect(submitSpy).not.toHaveBeenCalled();
+    });
+
+    it('should have the same effect as "required" if checkbox is checked and field is not blank',function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template         : "#form-template",
+        fields           : {
+          fnamerequired : {
+            el: ".fnamerequired"
+          },
+          fname : {
+            el         : ".fname",
+            requiredIfField   : {
+              errorMessage: "REQUIRED",
+              field: 'fnamerequired'
+            },
+            validateOn : 'blur',
+            validations : {
+              foo : 'BAR'
+            }
+          }
+        },
+        rules : {
+          foo : function() {
+            return false;
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail     : submitFailSpy,
+        onSubmit         : submitSpy
+      }))();
+
+      form.render();
+
+      //check the checkbox
+      form.$('[data-field="fnamerequired"]').prop('checked', true);
+      form.$('[data-field="fname"]').val('exists');
+
+      form.submit();
+
+      expect(submitFailSpy).toHaveBeenCalledWith({
+        fname : {
+          el : ".fname",
+          error : ["BAR"],
+          field : 'fname'
+        }
+      });
+      expect(submitSpy).not.toHaveBeenCalled();
+    });
+
+
+    it('should not have an effect if checkbox is not checked',function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template         : "#form-template",
+        fields           : {
+          fnamerequired : {
+            el: ".fnamerequired"
+          },
+          fname : {
+            el         : ".fname",
+            requiredIfField   : {
+              errorMessage: "REQUIRED",
+              field: 'fnamerequired'
+            },
+            validateOn : 'blur',
+            validations : {
+              foo : 'BAR'
+            }
+          }
+        },
+        rules : {
+          foo : function() {
+            return false;
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail     : submitFailSpy,
+        onSubmit         : submitSpy
+      }))();
+
+      form.render();
+
+      form.submit();
+
+      expect(submitFailSpy).not.toHaveBeenCalled();
+      expect(submitSpy).toHaveBeenCalled();
+    });
+  });
+
 });
 
