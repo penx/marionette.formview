@@ -25,7 +25,92 @@ describe('Validations',function(){
     validationErrorSpy = jasmine.createSpy('onValidationFail').andCallFake(logSpy);
   });
 
-  it('should call custom validations',function(){
+  it('should call custom validations on non required, non-empty fields',function(){
+    var form = new (Backbone.Marionette.FormView.extend({
+      template         : "#form-template",
+      fields           : {
+        fname : {
+          el         : ".fname",
+          validateOn : 'blur',
+          validations : {
+            foo : 'BAR'
+          }
+        }
+      },
+      rules : {
+        foo : function() {
+          return false;
+        }
+      },
+      onValidationFail : validationErrorSpy,
+      onSubmitFail     : submitFailSpy,
+      onSubmit         : submitSpy
+    }))();
+
+    form.render();
+
+    form.$('[data-field="fname"]').val('test').blur();
+
+    expect(validationErrorSpy).toHaveBeenCalledWith({
+      el    : '.fname',
+      error : ['BAR'],
+      field : 'fname'
+    });
+
+    expect(submitFailSpy).not.toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
+
+    form.submit();
+
+    expect(submitFailSpy).toHaveBeenCalledWith({
+      fname : {
+        el : ".fname",
+        error : ['BAR'],
+        field : 'fname'
+      }
+    });
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call required validation on required, empty fields but not continue to custom validations',function(){
+    var form = new (Backbone.Marionette.FormView.extend({
+      template         : "#form-template",
+      fields           : {
+        fname : {
+          el         : ".fname",
+          required   : 'Field required',
+          validateOn : 'blur',
+          validations : {
+            foo : 'BAR'
+          }
+        }
+      },
+      rules : {
+        foo : function() {
+          return false;
+        }
+      },
+      onValidationFail : validationErrorSpy,
+      onSubmitFail     : submitFailSpy,
+      onSubmit         : submitSpy
+    }))();
+
+    form.render();
+
+    form.$('[data-field="fname"]').blur();
+
+    expect(validationErrorSpy).toHaveBeenCalled();
+
+    expect(submitFailSpy).not.toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
+
+    form.submit();
+
+    expect(submitFailSpy).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call custom validations on non required, empty fields',function(){
     var form = new (Backbone.Marionette.FormView.extend({
       template         : "#form-template",
       fields           : {
@@ -51,25 +136,15 @@ describe('Validations',function(){
 
     form.$('[data-field="fname"]').blur();
 
-    expect(validationErrorSpy).toHaveBeenCalledWith({
-      el    : '.fname',
-      error : ['BAR'],
-      field : 'fname'
-    });
+    expect(validationErrorSpy).not.toHaveBeenCalled();
 
     expect(submitFailSpy).not.toHaveBeenCalled();
     expect(submitSpy).not.toHaveBeenCalled();
 
     form.submit();
 
-    expect(submitFailSpy).toHaveBeenCalledWith({
-      fname : {
-        el : ".fname",
-        error : ['BAR'],
-        field : 'fname'
-      }
-    });
-    expect(submitSpy).not.toHaveBeenCalled();
+    expect(submitFailSpy).not.toHaveBeenCalled();
+    expect(submitSpy).toHaveBeenCalled();
   });
 
   it('should be able to mix required and custom validations',function(){

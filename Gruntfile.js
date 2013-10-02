@@ -103,12 +103,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Default task.
-  grunt.registerTask('default', ['lint', 'jasmine']);
+  grunt.registerTask('default', ['jasmine']);
   grunt.registerTask('test', ['jasmine']);
   grunt.registerTask('test-web', ['jasmine-server']);
 
   //Turned LINT off complaining about /*jshint unused:true */
   grunt.registerTask('build', ['concat', 'uglify', 'jasmine']);
-  grunt.registerTask('build-notest', ['lint', 'concat', 'uglify']);
+  grunt.registerTask('build-notest', ['concat', 'uglify']);
 
 };
