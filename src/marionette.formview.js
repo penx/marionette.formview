@@ -134,7 +134,7 @@
 
       // Don't bother with other validations if failed 'required' already
       // Only run validations if the field is required or not blank (i.e. Don't run validations if not required and field is blank)
-      if (isValid && validations && (fieldOptions.required || val)) {
+      if (isValid && validations && (fieldOptions.validateEmptyField || fieldOptions.required || val)) {
 
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);

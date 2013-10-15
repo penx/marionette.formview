@@ -1,4 +1,4 @@
-/*! marionette-formview - v1.0.2 branch - 2013-10-02 */
+/*! marionette-formview penx branch - v1.0.3 - 2013-10-15 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -135,7 +135,7 @@
 
       // Don't bother with other validations if failed 'required' already
       // Only run validations if the field is required or not blank (i.e. Don't run validations if not required and field is blank)
-      if (isValid && validations && (fieldOptions.required || val)) {
+      if (isValid && validations && (fieldOptions.validateEmptyField || fieldOptions.required || val)) {
 
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);
