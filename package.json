@@ -11,7 +11,9 @@
     "type": "git"
   },
   "scripts": {
-    "test": "grunt jasmine"
+    "test": "grunt jasmine",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "grunt": "~0.4.1"
@@ -20,6 +22,8 @@
     "grunt-contrib-jshint": "~0.5.4",
     "grunt-contrib-jasmine": "~0.4.2",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.1"
-  }
+    "grunt-contrib-uglify": "~0.2.1",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
